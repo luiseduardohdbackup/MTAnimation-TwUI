@@ -8,6 +8,8 @@
 
 #if TARGET_IPHONE_OS
 #import <UIKit/UIKit.h>
+#else
+#import <MTAnimationTwUIAdapter.h>
 #endif
 
 #import "MTTimingFunctions.h"

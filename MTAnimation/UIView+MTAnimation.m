@@ -52,7 +52,7 @@ static const char startBackgroundColorKey;
 static const char startUserInteractionEnabledKey;
 
 
-@interface UIView ()
+@interface TUIView ()
 @property (assign, nonatomic) CGRect                startBounds;
 @property (assign, nonatomic) CGPoint               startCenter;
 @property (assign, nonatomic) CGAffineTransform     startTransform;
@@ -62,7 +62,7 @@ static const char startUserInteractionEnabledKey;
 @end
 
 
-@implementation UIView (MTAnimation)
+@implementation TUIView (MTAnimation)
 
 + (void)mt_animateViews:(NSArray *)views
                duration:(NSTimeInterval)duration
@@ -81,7 +81,7 @@ static const char startUserInteractionEnabledKey;
 + (void)mt_animateViews:(NSArray *)views
                duration:(NSTimeInterval)duration
          timingFunction:(MTTimingFunction)timingFunction
-                options:(UIViewAnimationOptions)options
+                options:(TUIViewAnimationOptions)options
              animations:(MTAnimationsBlock)animations
              completion:(MTAnimationCompletionBlock)completion
 {
@@ -114,7 +114,7 @@ static const char startUserInteractionEnabledKey;
                duration:(NSTimeInterval)duration
          timingFunction:(MTTimingFunction)timingFunction
                   range:(MTAnimationRange)range
-                options:(UIViewAnimationOptions)options
+                options:(TUIViewAnimationOptions)options
              animations:(MTAnimationsBlock)animations
              completion:(MTAnimationCompletionBlock)completion
 {
@@ -138,17 +138,17 @@ static const char startUserInteractionEnabledKey;
     animationBatch.views                = views;
     [[self animationBatches] addObject:animationBatch];
 
-    for (UIView *view in views) {
+    for (TUIView *view in views) {
         [view takeStartSnapshot:options];
     }
 
     if (animations) animations();
 
-    for (UIView *view in views) {
+    for (TUIView *view in views) {
 
         // apply UIViewAnimationOptionBeginFromCurrentState option
         CALayer *current = nil;
-        if (mt_isInMask(options, UIViewAnimationOptionBeginFromCurrentState)) {
+        if (mt_isInMask(options, TUIViewAnimationOptionBeginFromCurrentState)) {
             BOOL currentlyAnimating = [[view.layer animationKeys] count] > 0;
             if (currentlyAnimating) {
                 current = view.layer.presentationLayer;
@@ -259,7 +259,7 @@ static const char startUserInteractionEnabledKey;
             if ([animationBatch isCompleted]) {
 
                 // restore user interaction values
-                for (UIView *view in animationBatch.views) {
+                for (TUIView *view in animationBatch.views) {
                     view.userInteractionEnabled = view.startUserInteractionEnabled;
                 }
 
@@ -275,7 +275,7 @@ static const char startUserInteractionEnabledKey;
 
 #pragma mark - Private
 
-- (void)takeStartSnapshot:(UIViewAnimationOptions)options
+- (void)takeStartSnapshot:(TUIViewAnimationOptions)options
 {
     self.startBounds                = self.bounds;
     self.startCenter                = self.center;
@@ -315,7 +315,7 @@ static const char startUserInteractionEnabledKey;
         rect.size.width     = fromRect.size.width   + (v * (toRect.size.width    - fromRect.size.width));
         rect.size.height    = fromRect.size.height  + (v * (toRect.size.height   - fromRect.size.height));
 
-        [values addObject:[NSValue valueWithCGRect:rect]];
+        [values addObject:[NSValue valueWithRect:rect]];
 
         progress += increment;
     }
@@ -342,7 +342,7 @@ static const char startUserInteractionEnabledKey;
         point.x             = fromPoint.x     + (v * (toPoint.x      - fromPoint.x));
         point.y             = fromPoint.y     + (v * (toPoint.y      - fromPoint.y));
 
-        [values addObject:[NSValue valueWithCGPoint:point]];
+        [values addObject:[NSValue valueWithPoint:point]];
 
         progress += increment;
     }
@@ -404,7 +404,7 @@ static const char startUserInteractionEnabledKey;
 - (void)addAnimation:(CAKeyframeAnimation *)animation
               forKey:(NSString *)key
                range:(MTAnimationRange)range
-             options:(UIViewAnimationOptions)options
+             options:(TUIViewAnimationOptions)options
          perspective:(CGFloat)perspective
 {
     // slice the animation to the range
@@ -442,11 +442,11 @@ static const char startUserInteractionEnabledKey;
 //        self.layer.needsDisplayOnBoundsChange = YES;
 //    }
 
-    if (mt_isInMask(options, UIViewAnimationOptionAutoreverse)) {
+    if (mt_isInMask(options, TUIViewAnimationOptionAutoreverse)) {
         animation.autoreverses = YES;
     }
 
-    if (mt_isInMask(options, UIViewAnimationOptionRepeat)) {
+    if (mt_isInMask(options, TUIViewAnimationOptionRepeat)) {
         animation.repeatCount = HUGE_VALF;
     }
 
@@ -460,12 +460,12 @@ static const char startUserInteractionEnabledKey;
     if ([key isEqualToString:@"bounds"]) {
         self.bounds                     = self.startBounds;
         [self.layer addAnimation:animation forKey:key];
-        self.layer.bounds               = [[animation.values lastObject] CGRectValue];
+        self.layer.bounds               = [[animation.values lastObject] rectValue];
     }
     else if ([key isEqualToString:@"position"]) {
         self.center                     = self.startCenter;
         [self.layer addAnimation:animation forKey:key];
-        self.layer.position             = [[animation.values lastObject] CGPointValue];
+        self.layer.position             = [[animation.values lastObject] pointValue];
     }
     else if ([key isEqualToString:@"opacity"]) {
         self.alpha                      = self.startAlpha;
@@ -514,24 +514,24 @@ static const char startUserInteractionEnabledKey;
 
 - (void)setStartBounds:(CGRect)startBounds
 {
-    objc_setAssociatedObject(self, &startBoundsKey, [NSValue valueWithCGRect:startBounds], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    objc_setAssociatedObject(self, &startBoundsKey, [NSValue valueWithRect:startBounds], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 - (CGRect)startBounds
 {
     NSValue *value = objc_getAssociatedObject(self, &startBoundsKey);
-    return value ? [value CGRectValue] : CGRectZero;
+    return value ? [value rectValue] : CGRectZero;
 }
 
 - (void)setStartCenter:(CGPoint)startCenter
 {
-    objc_setAssociatedObject(self, &startCenterKey, [NSValue valueWithCGPoint:startCenter], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    objc_setAssociatedObject(self, &startCenterKey, [NSValue valueWithPoint:startCenter], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 - (CGPoint)startCenter
 {
     NSValue *value = objc_getAssociatedObject(self, &startCenterKey);
-    return value ? [value CGPointValue] : CGPointZero;
+    return value ? [value pointValue] : CGPointZero;
 }
 
 - (void)setStartTransform:(CGAffineTransform)startTransform

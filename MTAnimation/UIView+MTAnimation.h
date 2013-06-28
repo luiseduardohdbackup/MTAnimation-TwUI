@@ -6,17 +6,25 @@
 //  Copyright (c) 2013 Mysterious Trousers. All rights reserved.
 //
 
-#if TARGET_IPHONE_OS
-#import <UIKit/UIKit.h>
-#else
-#import <MTAnimationTwUIAdapter.h>
-#endif
-
+#import "TUIView.h"
 #import "MTTimingFunctions.h"
 #import "MTAnimationTypes.h"
 
 
-@interface UIView (MTAnimation)
+typedef NS_OPTIONS(NSUInteger, TUIViewAnimationOptions) {
+    TUIViewAnimationOptionLayoutSubviews            = 1 <<  0,
+    TUIViewAnimationOptionAllowUserInteraction      = 1 <<  1,
+    TUIViewAnimationOptionBeginFromCurrentState     = 1 <<  2,
+    TUIViewAnimationOptionRepeat                    = 1 <<  3,
+    TUIViewAnimationOptionAutoreverse               = 1 <<  4,
+    TUIViewAnimationOptionOverrideInheritedDuration = 1 <<  5,
+    TUIViewAnimationOptionOverrideInheritedCurve    = 1 <<  6,
+    TUIViewAnimationOptionAllowAnimatedContent      = 1 <<  7,
+    TUIViewAnimationOptionShowHideTransitionViews   = 1 <<  8,
+};
+
+
+@interface TUIView (MTAnimation)
 
 /**
  Some (but not all) of the easing functions can be exaggerated. (e.g. elastic out will be swing 
@@ -46,7 +54,7 @@
 + (void)mt_animateViews:(NSArray *)views
                duration:(NSTimeInterval)duration
          timingFunction:(MTTimingFunction)timingFunction
-                options:(UIViewAnimationOptions)options
+                options:(TUIViewAnimationOptions)options
              animations:(MTAnimationsBlock)animations
              completion:(MTAnimationCompletionBlock)completion;
 
@@ -72,7 +80,7 @@
                duration:(NSTimeInterval)duration
          timingFunction:(MTTimingFunction)timingFunction
                   range:(MTAnimationRange)range
-                options:(UIViewAnimationOptions)options
+                options:(TUIViewAnimationOptions)options
              animations:(MTAnimationsBlock)animations
              completion:(MTAnimationCompletionBlock)completion;
 
